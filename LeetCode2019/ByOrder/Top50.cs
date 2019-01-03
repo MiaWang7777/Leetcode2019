@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 using LeetCode2019.Shared;
 
 namespace LeetCode2019.ByOrder
@@ -194,6 +195,181 @@ namespace LeetCode2019.ByOrder
                 return FindKthElement(nums1,mid1+1,nums2, start2, k-k/2);
             }
             return FindKthElement(nums1, start1, nums2, mid2+1, k-k/2);
+        }
+
+        //================================================================================//
+        //----------5. Longest Palindromic Substring--Medium------------------------------//
+        /*
+            Given a string s, find the longest palindromic substring in s. You may assume that the maximum length of s is 1000.
+
+            Example 1:
+
+            Input: "babad"
+            Output: "bab"
+            Note: "aba" is also a valid answer.
+            Example 2:
+
+            Input: "cbbd"
+            Output: "bb"
+        */ 
+        //-----------------Notes--------------------------------------------------//
+        /* 
+            Solution 1 暴力解决: 找出以每一个点为起始的最长回文
+                        Time complexity: O(n^3), space complexity:O(1)
+        */
+        public string LongestPalindromeBrute(string s) {
+            if(string.IsNullOrEmpty(s))
+                return "";
+            int start =0, end = 0;
+            for(int i = 0; i<s.Length; i++)
+            {
+                for(int j=i; j<s.Length; j++)
+                {
+                    if(IsPalindrom(s,i,j) && j-i>end-start)
+                    {
+                        start = i; end = j;
+                    }
+                }
+            }
+            return s.Substring(start, end-start+1);
+        }
+        private bool IsPalindrom(string s, int start, int end)
+        {
+            while(start<end && s[start]==s[end])
+            {
+                start++;
+                end--;
+            }
+            if(start<end)
+                return false;
+            return true;
+        }
+        /* 
+            Solution 2: Dynamic Programming 由暴力解决办法简化而来。记住由i到j的substring是不是回文从而可以不需要重复检查
+                        substring(i,j) --> 回文 if(s[i]==s[j] && substring(i+1, j-1) 是回文)
+                        Time complexity: O(n^2), space complexity:O(n^2)
+
+                        需要注意的是提前fill bool[,] 当i==j和当i=j-1的时候为true 代表substring长度为1 和2的时候与其他substring无关
+                        当计算当前位置是否为回文的时候需要注意循环的写法是一层一层fill的
+                        11          11          11
+                        011         111         111
+                        0011        0011        1111
+                        00011       00011       00011
+                        初始状态
+        */
+        public string LongestPalindromeDP(string s) {
+            if(string.IsNullOrEmpty(s))
+                return "";
+            int start =0, end = 0;
+            bool[,] isPalindrom = new bool[s.Length,s.Length];
+            for(int i =0; i<s.Length;i++)
+            {
+                isPalindrom[i,i] = true;
+                if(i<s.Length-1)
+                    isPalindrom[i+1, i] = true;
+            }
+            for(int j = 1; j<s.Length; j++)
+            {
+                for(int i=0; i<j; i++)
+                {
+                    isPalindrom[i,j] = (s[i]==s[j])&&isPalindrom[i+1, j-1];
+                    if(isPalindrom[i,j] && j-i>end-start)
+                    {
+                        start=i; end = j;
+                    }
+                }
+            }
+            return s.Substring(start, end-start+1);
+        }
+        /* 
+            Solution 3: 1) 假设每一个字母为分割线  babacd 找出长度为基数的以每个字母为中心的最长回文，
+                        2) 每两个字母中间的空格为分割线 ba|bacd 找出长度为偶数的最长回文。
+                        3）更新起始与终止位置。最后返回结果的substring
+                        需要注意的就是其实位置与返回长度的时候index的处理。
+                        Time complexity: O(n^2), space complexity:O(1)
+        */
+        public string LongestPalindrome(string s) {
+            if(string.IsNullOrEmpty(s))
+                return "";
+            int start =0, end = 0;
+            for(int i = 0; i<s.Length; i++)
+            {
+                int odd=GetPalindrom(s, i,i);
+                int even = GetPalindrom(s,i,i+1);
+                int len =Math.Max(odd,even);
+                if(len>end-start+1)
+                {
+                    start = i-(len-1)/2;
+                    end = i+len/2;
+                }
+            }
+            return s.Substring(start, end-start+1);
+        }
+        public int GetPalindrom(string s, int left, int right)
+        {
+            while(left>=0 && right<s.Length && s[left]==s[right])
+            {
+                left--;
+                right++;
+            }
+            return right-left-1;
+        }
+
+        //================================================================================//
+        //----------6. ZigZag Conversion--Medium-----------------------------------------//
+        /*
+        The string "PAYPALISHIRING" is written in a zigzag pattern on a given number of rows like this: (you may want to display this pattern in a fixed font for better legibility)
+
+            P   A   H   N
+            A P L S I I G
+            Y   I   R
+            And then read line by line: "PAHNAPLSIIGYIR"
+
+            Write the code that will take a string and make this conversion given a number of rows:
+
+            string convert(string s, int numRows);
+            Example 1:
+
+            Input: s = "PAYPALISHIRING", numRows = 3
+            Output: "PAHNAPLSIIGYIR"
+            Example 2:
+
+            Input: s = "PAYPALISHIRING", numRows = 4
+            Output: "PINALSIGYAHRPI"
+            Explanation:
+
+            P     I    N
+            A   L S  I G
+            Y A   H R
+            P     I
+         */
+
+        public string Convert(string s, int numRows) {
+            StringBuilder[] sbArray = new StringBuilder[numRows];
+            for(int i=0; i<numRows; i++)
+            {
+                sbArray[i] = new StringBuilder();
+            }
+            int pos=0;
+            while(pos<s.Length)
+            {
+                for(int i =0;i<numRows&&pos<s.Length; i++)
+                {
+                    sbArray[i].Append(s[pos]);
+                    pos++;
+                }
+                for(int i=numRows-2; i>0&&pos<s.Length; i--)
+                {
+                    sbArray[i].Append(s[pos]);
+                    pos++;
+                }
+            }
+            StringBuilder sb = new StringBuilder();
+            for(int i=0; i<numRows; i++)
+            {
+                sb.Append(sbArray[i].ToString());
+            }
+            return sb.ToString();
         }
     }
 }
