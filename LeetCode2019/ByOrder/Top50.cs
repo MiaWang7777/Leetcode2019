@@ -5,6 +5,14 @@ using LeetCode2019.Shared;
 
 namespace LeetCode2019.ByOrder
 {
+    /*
+    Need To Review！
+    1. Two Sum--Easy
+    3. Longest Substring Without Repeating Characters--Medium
+    4. Median of Two Sorted Arrays--Hard
+    5. Longest Palindromic Substring--Medium
+    10. Regular Expression Matching--Hard
+     */
     public class Top50
     {
         //----------1. Two Sum--Easy----------------------------------//
@@ -371,5 +379,279 @@ namespace LeetCode2019.ByOrder
             }
             return sb.ToString();
         }
+        //================================================================================//
+        //----------7. Reverse Integern--Easy-----------------------------------------//
+        /*
+        Given a 32-bit signed integer, reverse digits of an integer.
+
+        Example 1:
+
+        Input: 123
+        Output: 321
+        Example 2:
+
+        Input: -123
+        Output: -321
+        Example 3:
+
+        Input: 120
+        Output: 21
+        Note:
+        Assume we are dealing with an environment which could only store integers within the 32-bit
+        signed integer range: [−231,  231 − 1]. For the purpose of this problem, assume that your 
+        function returns 0 when the reversed integer overflows.
+         */
+        public int ReverseInteger(int x) 
+        {
+            int res =0;
+            while(x!=0)
+            {
+                if(res>Int32.MaxValue/10 || (res==Int32.MaxValue/10&&x%10>7))
+                    return 0;
+                if(res<Int32.MinValue/10 || (res==Int32.MinValue/10&&x%10<-8))
+                    return 0;
+                res = res*10+x%10;
+                x=x/10;
+            }
+            return res;
+        }
+        //================================================================================//
+        //----------8. String to Integer (atoi)--Medium-----------------------------------------//
+        /*
+        这个题就不贴描述了。。主要就是corner case 的handle 当数值overflow的时候怎么办
+         */
+        public int MyAtoi(string str) 
+        {
+            if(string.IsNullOrEmpty(str))
+                return 0;
+            string trim = str.Trim();
+            char[] chars = trim.ToCharArray();
+            if(trim.Length==0)
+                return 0;
+            int pos=0;
+            int res = 0;
+            bool neg = false;
+            if(!Char.IsDigit(chars[pos])&&chars[pos]!='-'&&chars[pos]!='+')
+                    return 0;
+            if(chars[pos]=='-')
+            {
+                neg = true;
+                pos++;
+            }
+            else if(chars[pos]=='+')
+            {
+                pos++;
+            }
+            
+            while(pos<trim.Length&&Char.IsDigit(chars[pos]))
+            {
+                if(res>Int32.MaxValue/10)
+                {
+                    if(neg)
+                        return Int32.MinValue;
+                    return Int32.MaxValue;
+                }
+                if(res==Int32.MaxValue/10)
+                {
+                    if(neg && chars[pos]-'0'>7)
+                        return Int32.MinValue;
+                    else if(!neg && chars[pos]-'0'>6)
+                        return Int32.MaxValue;
+                }
+                res=res*10+(chars[pos]-'0');
+                pos++;
+            }
+            return neg?-1*res :res;
+        }
+        //================================================================================//
+        //----------9. Palindrome Number--Easy-----------------------------------------//
+        /*
+        Determine whether an integer is a palindrome. An integer is a palindrome when it reads the same backward as forward.
+
+            Example 1:
+
+            Input: 121
+            Output: true
+            Example 2:
+
+            Input: -121
+            Output: false
+            Explanation: From left to right, it reads -121. From right to left, it becomes 121-. Therefore it is not a palindrome.
+            Example 3:
+
+            Input: 10
+            Output: false
+            Explanation: Reads 01 from right to left. Therefore it is not a palindrome.
+         */
+        public bool IsPalindromeNumber(int x) 
+        {
+            if(x<0)
+                return false;
+            int reverse = 0;
+            int org = x;
+            while(x!=0)
+            {
+                reverse=reverse*10+x%10;
+                x = x/10;
+            }
+            return reverse==org;
+        }
+        //========================================================================================//
+        //----------10. Regular Expression Matching--Hard-----------------------------------------//
+        
+        /*
+        Given an input string (s) and a pattern (p), implement regular expression matching with support for '.' and '*'.
+            '.' Matches any single character.
+            '*' Matches zero or more of the preceding element.
+            The matching should cover the entire input string (not partial).
+
+            Note:
+
+            s could be empty and contains only lowercase letters a-z.
+            p could be empty and contains only lowercase letters a-z, and characters like . or *.
+            Example 1:
+
+            Input:
+            s = "aa"
+            p = "a"
+            Output: false
+            Explanation: "a" does not match the entire string "aa".
+            Example 2:
+
+            Input:
+            s = "aa"
+            p = "a*"
+            Output: true
+            Explanation: '*' means zero or more of the precedeng element, 'a'. Therefore, by repeating 'a' once, it becomes "aa".
+            Example 3:
+
+            Input:
+            s = "ab"
+            p = ".*"
+            Output: true
+            Explanation: ".*" means "zero or more (*) of any character (.)".
+            Example 4:
+
+            Input:
+            s = "aab"
+            p = "c*a*b"
+            Output: true
+            Explanation: c can be repeated 0 times, a can be repeated 1 time. Therefore it matches "aab".
+            Example 5:
+
+            Input:
+            s = "mississippi"
+            p = "mis*is*p*."
+            Output: false
+         */
+
+        //-----------------Notes--------------------------------------------------//
+        /*
+        Time Complexity O(m*n) where m is length of s, n is length of o.
+        Space Complexity O(m*n)
+        Dynamic Programing
+        s="mississippi", p = "mis*is*p*."
+        建立一个大小为 s.Length+1 X p.Length+1 的2D array dp[,].
+        dp[0,0] always is true。 两个空string永远match。
+        dp[0,1] always is false. 一个空string与一个字母的string永远不可能match。
+        dp[0,2] is true only when p[2-1] is '*', 当p有两个字母只有当第二个字母为* 时候才能与空的s match。
+        由此可以推出：
+        dp[0,0] = true; dp[0,1] = false;
+        dp[0, j] = p[i-1]=='*'&& dp[0,i-2] 
+
+        分析 dp[i,j] 的情况
+        dp[i, j]表示为在s的第i个字母的位置是否能与p的第j个字母位置是否可以match。
+        这里如果换成index 则应该-1.
+
+        1. s[i-1]==p[j-1] || p[j-1]=='.'
+            这种情况下dp[i,j] 只取决于前一位是否match 
+            dp[i,j] = dp[i-1,j-1];
+        2. p[j-1]=='*'
+            细分为
+                如果*的前一位不等于‘，’或者不与s[i-1]相等 p[j-2]!=s[i-1] 
+                    这种情况下* 的作用应该是删去前一位字母并且看dp[i,j-2]是否match
+                其他情况 即 s[i-1]==p[j-2] || p[j-2]=='.'
+                    当* 相当于多重复一次之前字母的时候
+                        dp[i-1,j];
+                        或者
+                    当*相当于1即不代表任何字母的时候
+                        dp[i,j-1];
+                        或者
+                    当*相当于0即删除前一个字母的时候
+                        dp[i, j-2];
+        3. 其他任何情况 dp【i，j】都为false
+        */
+        public bool IsMatch(string s, string p) 
+        {
+            bool[,] dp = new bool[s.Length+1, p.Length+1];
+            dp[0,0]= true;
+            if(p.Length>=1)
+                dp[0,1] = false;
+            for(int i =2; i<=p.Length; i++)
+            {
+                dp[0,i] = p[i-1]=='*'&&dp[0, i-2];
+            }
+            
+            for(int i =1; i<=s.Length; i++)
+            {
+                for(int j=1; j<=p.Length; j++)
+                {
+                    if(s[i-1]==p[j-1]||p[j-1]=='.')
+                    {
+                        dp[i,j]=dp[i-1,j-1];
+                    }
+                    else if(j>1 && p[j-1]=='*')
+                    {
+                        if( p[j-2]!=s[i-1] && p[j-2]!='.')
+                        {
+                            dp[i, j] = dp[i, j-2];
+                        }
+                        else
+                        {
+                            dp[i, j] = dp[i-1, j]||dp[i, j-1]|| dp[i, j-2];
+                        }
+                    }
+                }
+            }
+            return dp[s.Length, p.Length];
+        }
+        //========================================================================================//
+        //----------11. Container With Most Water--Medium-----------------------------------------//
+        /*
+        Given n non-negative integers a1, a2, ..., an , where each represents a point at coordinate (i, ai).
+         n vertical lines are drawn such that the two endpoints of line i is at (i, ai) and (i, 0). 
+         Find two lines, which together with x-axis forms a container, such that the container contains the most water.
+
+        Note: You may not slant the container and n is at least 2.
+
+        Example:
+
+        Input: [1,8,6,2,5,4,8,3,7]
+        Output: 49
+ 
+         */
+
+         /*-----------------------Notes----------------------------------------------- */
+         /*
+         Time Complexity: O(n), Space complexity: O(1)
+         Two pointer
+          */
+        public int MaxArea(int[] height) 
+        {
+            if(height==null|| height.Length==0)
+                return 0;
+            int p1=0, p2= height.Length-1;
+            int res = 0;
+            while(p1<p2)
+            {
+                res = Math.Max(Math.Min(height[p1], height[p2])*(p2-p1), res);
+                if(height[p1]<height[p2])
+                    p1++;
+                else
+                    p2--;
+            }
+            return res;
+        }
+    
     }
 }
