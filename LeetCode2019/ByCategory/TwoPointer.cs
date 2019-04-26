@@ -169,5 +169,292 @@ namespace LeetCode2019.ByCategory
             }
             return closest;
         }
+
+        //========================================================================================//
+        //----------18. 4 Sum--Medium-------------------------------------------------------------//
+        /*
+            Given an array nums of n integers and an integer target, are there elements a, b, c, and d in nums such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
+
+            Note:
+
+            The solution set must not contain duplicate quadruplets.
+
+            Example:
+
+            Given array nums = [1, 0, -1, 0, -2, 2], and target = 0.
+
+            A solution set is:
+            [
+            [-1,  0, 0, 1],
+            [-2, -1, 1, 2],
+            [-2,  0, 0, 2]
+            ]
+         */
+         /*----------------------Notes---------------------------------------------------------- */
+         /* 4 sum -> 3 sum -> 2 sum
+            Time complexity: O(n^3) Space Complexity: O(1)
+          */
+        public IList<IList<int>> FourSum(int[] nums, int target) 
+        {
+            IList<IList<int>> res = new List<IList<int>>();
+            if(nums==null || nums.Length ==0)
+                return res;
+            Array.Sort(nums);
+            for(int i =0; i<nums.Length; i++)
+            {
+                if(i>0 && nums[i]==nums[i-1])
+                    continue;
+                for(int j =i+1; j<nums.Length; j++)
+                {
+                    if(j>i+1 && nums[j]==nums[j-1])
+                        continue;
+                    int p1=j+1; int p2=nums.Length-1;
+                    while(p1<p2)
+                    {
+                        if(p1>j+1 && nums[p1]==nums[p1-1])
+                        {
+                            p1++;
+                            continue;
+                        }
+
+                        if(p2<nums.Length-1 && nums[p2]==nums[p2+1])
+                        {
+                            p2--;
+                            continue;
+                        }
+                        if(nums[p1]+nums[p2]+nums[i]+nums[j]==target)
+                        {
+                            res.Add(new List<int>{nums[i], nums[j], nums[p1], nums[p2]});
+                            p1++;
+                            p2--;
+                        }
+                        else if(nums[p1]+nums[p2]+nums[i]+nums[j]>target)
+                        {
+                            p2--;
+                        }
+                        else
+                            p1++;
+                    }
+                }
+            }
+            return res;
+        }
+        //========================================================================================//
+        //----------19. Remove Nth Node From End of List--Medium----------------------------------//
+        /*
+            Given a linked list, remove the n-th node from the end of list and return its head.
+
+            Example:
+
+            Given linked list: 1->2->3->4->5, and n = 2.
+
+            After removing the second node from the end, the linked list becomes 1->2->3->5.
+            Note:
+
+            Given n will always be valid.
+
+            Follow up:
+
+            Could you do this in one pass?
+         */
+         /* not one pass,  1. find the length of the list, 2. delete the node*/
+        public ListNode RemoveNthFromEnd(ListNode head, int n) 
+        {
+            int length = CountLength(head);
+            int target = length-n;
+            ListNode node = head;
+            if(target==0)
+            {
+                return head.next;
+            }
+            while(target>1)
+            {
+                node = node.next;
+                target--;
+            }
+            node.next = node.next.next;
+            return head;
+        }
+        private int CountLength(ListNode head)
+        {
+            ListNode node = head;
+            int res = 0;
+            while(node!=null)
+            {
+                res++;
+                node = node.next;
+            }
+            return res;
+        }
+
+        /* One pass solution: two pointer to have one fast pointer to be ahead of slow pointer with n steps. 
+        then when fastpointer pointing to null we can delete next node of slow pointer. 
+        need to handle when delete the head node, or we can have a dummy head.
+        */
+        public ListNode RemoveNthFromEndOnePass(ListNode head, int n) 
+        {
+            ListNode slow = head;
+            ListNode fast = head;
+            while(n>0)
+            {
+                fast=fast.next;
+                n--;
+            }
+            if(fast==null)
+                return head.next;
+            while(fast.next!=null)
+            {
+                slow=slow.next;
+                fast= fast.next;
+            }
+            slow.next= slow.next.next;
+            return head;
+        }
+
+                //========================================================================================//
+        //----------26.  Remove Duplicates from Sorted Array--Easy--------------------------------//
+        /*
+        Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return the new length.
+
+        Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+
+        Example 1:
+
+        Given nums = [1,1,2],
+
+        Your function should return length = 2, with the first two elements of nums being 1 and 2 respectively.
+
+        It doesn't matter what you leave beyond the returned length.
+        Example 2:
+
+        Given nums = [0,0,1,1,1,2,2,3,3,4],
+
+        Your function should return length = 5, with the first five elements of nums being modified to 0, 1, 2, 3, and 4 respectively.
+
+        It doesn't matter what values are set beyond the returned length.
+         */
+        /*-------------------------Notes------------------------------------------------------- */
+        /*
+        Two pointer p1 pointing to the pos that need to be swapped, p2 is looping through for the next value
+         */
+        public int RemoveDuplicates(int[] nums) 
+        {
+            if(nums==null || nums.Length==0)
+                return 0;
+
+        //herer can be refactored, if p1==p2 just ignore
+            int p1=0;
+            while(p1<nums.Length && nums[p1]!=nums[p1-1])
+            {
+                p1++;
+            }
+            int p2= p1;
+            while(p2<nums.Length)
+            {
+                if(nums[p2]>nums[p1-1])
+                {
+                    nums[p1] = nums[p2];
+                    p1++;
+                }
+                p2++;
+            }
+            return p1;
+        }
+        public int RemoveDuplicatesRefactored(int[] nums) 
+        {
+            if(nums==null || nums.Length==0)
+                return 0;
+            int p1 =0;
+            for(int i=1; i<nums.Length; i++)
+            {
+                if(nums[i]!=nums[p1])
+                {
+                    p1++;
+                    nums[p1] = nums[i];
+                }
+            }
+            return p1+1;
+        }
+
+                //----------27. Remove Element--Easy--------------------------------//
+        /*
+        Given an array nums and a value val, remove all instances of that value in-place and return the new length.
+        Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+        The order of elements can be changed. It doesn't matter what you leave beyond the new length.
+        Example 1:
+        Given nums = [3,2,2,3], val = 3,
+        Your function should return length = 2, with the first two elements of nums being 2.
+        It doesn't matter what you leave beyond the returned length.
+        Example 2:
+        Given nums = [0,1,2,2,3,0,4,2], val = 2,
+        Your function should return length = 5, with the first five elements of nums containing 0, 1, 3, 0, and 4.
+        Note that the order of those five elements can be arbitrary.
+        It doesn't matter what values are set beyond the returned length.
+        Clarification:
+        Confused why the returned value is an integer but your answer is an array?
+        Note that the input array is passed in by reference, which means modification to the input array will be known to the caller as well.
+        Internally you can think of this:
+        // nums is passed in by reference. (i.e., without making a copy)
+        int len = removeElement(nums, val);
+        // any modification to nums in your function would be known by the caller.
+        // using the length returned by your function, it prints the first len elements.
+        for (int i = 0; i < len; i++) {
+            print(nums[i]);
+        }
+         */
+        public int RemoveElement(int[] nums, int val) 
+        {
+            if(nums==null|| nums.Length==0)
+                return 0;
+            int p1 =0;
+            int p2 = nums.Length-1;
+            while(p1<=p2)
+            {
+                if(nums[p1]==val)
+                {
+                    nums[p1]=nums[p2];
+                    p2--;
+                }
+                else
+                    p1++;
+            }
+            return p2+1;
+        }
+        //========================================================================================//
+        //----------28. Implement strStr()--Easy--------------------------------------------------// 
+        /*
+            Implement strStr().
+
+            Return the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.
+
+            Example 1:
+
+            Input: haystack = "hello", needle = "ll"
+            Output: 2
+            Example 2:
+
+            Input: haystack = "aaaaa", needle = "bba"
+            Output: -1
+        */      
+        public int StrStr(string haystack, string needle) 
+        {
+            if(string.IsNullOrEmpty(needle) )
+                return 0;
+            for(int i = 0; i<haystack.Length;i++)
+            {
+                for(int j=0; j<needle.Length; j++)
+                {
+                    if(i+j==haystack.Length)
+                        return -1;
+                    if(haystack[i+j]!=needle[j])
+                        break;
+                    else if(j==needle.Length-1)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return -1;
+        } 
     }
 }

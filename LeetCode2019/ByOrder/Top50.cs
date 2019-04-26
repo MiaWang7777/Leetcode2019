@@ -13,6 +13,9 @@ namespace LeetCode2019.ByOrder
     5. Longest Palindromic Substring--Medium
     10. Regular Expression Matching--Hard
     15. 3 Sum--Medium
+    22.  Generate Parentheses--Medium
+    31. Next Permutation--Medium
+    32. Longest Valid Parentheses--Hard
      */
     public class Top50
     {
@@ -855,5 +858,932 @@ namespace LeetCode2019.ByOrder
             }
         }
     
+        //========================================================================================//
+        //----------18. 4 Sum--Medium-------------------------------------------------------------//
+        /*
+            Given an array nums of n integers and an integer target, are there elements a, b, c, and d in nums such that a + b + c + d = target? Find all unique quadruplets in the array which gives the sum of target.
+
+            Note:
+
+            The solution set must not contain duplicate quadruplets.
+
+            Example:
+
+            Given array nums = [1, 0, -1, 0, -2, 2], and target = 0.
+
+            A solution set is:
+            [
+            [-1,  0, 0, 1],
+            [-2, -1, 1, 2],
+            [-2,  0, 0, 2]
+            ]
+         */
+         /*----------------------Notes---------------------------------------------------------- */
+         /* 4 sum -> 3 sum -> 2 sum
+            Time complexity: O(n^3) Space Complexity: O(1)
+          */
+        public IList<IList<int>> FourSum(int[] nums, int target) 
+        {
+            IList<IList<int>> res = new List<IList<int>>();
+            if(nums==null || nums.Length ==0)
+                return res;
+            Array.Sort(nums);
+            for(int i =0; i<nums.Length; i++)
+            {
+                if(i>0 && nums[i]==nums[i-1])
+                    continue;
+                for(int j =i+1; j<nums.Length; j++)
+                {
+                    if(j>i+1 && nums[j]==nums[j-1])
+                        continue;
+                    int p1=j+1; int p2=nums.Length-1;
+                    while(p1<p2)
+                    {
+                        if(p1>j+1 && nums[p1]==nums[p1-1])
+                        {
+                            p1++;
+                            continue;
+                        }
+
+                        if(p2<nums.Length-1 && nums[p2]==nums[p2+1])
+                        {
+                            p2--;
+                            continue;
+                        }
+                        if(nums[p1]+nums[p2]+nums[i]+nums[j]==target)
+                        {
+                            res.Add(new List<int>{nums[i], nums[j], nums[p1], nums[p2]});
+                            p1++;
+                            p2--;
+                        }
+                        else if(nums[p1]+nums[p2]+nums[i]+nums[j]>target)
+                        {
+                            p2--;
+                        }
+                        else
+                            p1++;
+                    }
+                }
+            }
+            return res;
+        }
+        //========================================================================================//
+        //----------19. Remove Nth Node From End of List--Medium----------------------------------//
+        /*
+            Given a linked list, remove the n-th node from the end of list and return its head.
+
+            Example:
+
+            Given linked list: 1->2->3->4->5, and n = 2.
+
+            After removing the second node from the end, the linked list becomes 1->2->3->5.
+            Note:
+
+            Given n will always be valid.
+
+            Follow up:
+
+            Could you do this in one pass?
+         */
+         /* not one pass,  1. find the length of the list, 2. delete the node*/
+        public ListNode RemoveNthFromEnd(ListNode head, int n) 
+        {
+            int length = CountLength(head);
+            int target = length-n;
+            ListNode node = head;
+            if(target==0)
+            {
+                return head.next;
+            }
+            while(target>1)
+            {
+                node = node.next;
+                target--;
+            }
+            node.next = node.next.next;
+            return head;
+        }
+        private int CountLength(ListNode head)
+        {
+            ListNode node = head;
+            int res = 0;
+            while(node!=null)
+            {
+                res++;
+                node = node.next;
+            }
+            return res;
+        }
+
+        /* One pass solution: two pointer to have one fast pointer to be ahead of slow pointer with n steps. 
+        then when fastpointer pointing to null we can delete next node of slow pointer. 
+        need to handle when delete the head node, or we can have a dummy head.
+        */
+        public ListNode RemoveNthFromEndOnePass(ListNode head, int n) 
+        {
+            ListNode slow = head;
+            ListNode fast = head;
+            while(n>0)
+            {
+                fast=fast.next;
+                n--;
+            }
+            if(fast==null)
+                return head.next;
+            while(fast.next!=null)
+            {
+                slow=slow.next;
+                fast= fast.next;
+            }
+            slow.next= slow.next.next;
+            return head;
+        }
+        //========================================================================================//
+        //----------20.  Valid Parentheses--Easy--------------------------------------------------//
+        /*
+        Given a string containing just the characters '(', ')', '{', '}', '[' and ']', determine if the input string is valid.
+
+        An input string is valid if:
+
+        Open brackets must be closed by the same type of brackets.
+        Open brackets must be closed in the correct order.
+        Note that an empty string is also considered valid.
+        Example 2:
+
+        Input: "()[]{}"
+        Output: true
+        Example 3:
+
+        Input: "(]"
+        Output: false
+         */
+
+        public bool IsValid(string s) 
+        {
+            if(string.IsNullOrEmpty(s))
+                return true;
+            Stack<char> stack = new Stack<char>();
+            for(int i =0; i<s.Length; i++)
+            {
+                if(s[i]=='('||s[i]=='{'||s[i]=='[')
+                {
+                    stack.Push(s[i]);
+                }
+                else
+                {
+                    if(stack.Count!=0)
+                    {
+                        char cur = stack.Pop();
+                        if(s[i]==')'&& cur!='('||s[i]=='}'&& cur!='{'||s[i]==']' && cur!= '[')
+                            return false;
+                    }
+                    else
+                        return false;
+                }
+            }
+            if(stack.Count!=0)
+                return false;
+            return true;
+        }
+        //========================================================================================//
+        //----------21.  Merge Two Sorted Lists--Easy---------------------------------------------//
+        /*
+        Merge two sorted linked lists and return it as a new list. The new list should be made by 
+        splicing together the nodes of the first two lists.
+
+        Example:
+
+        Input: 1->2->4, 1->3->4
+        Output: 1->1->2->3->4->4
+        */
+        public ListNode MergeTwoLists(ListNode l1, ListNode l2) 
+        {
+            ListNode dummy = new ListNode(0);
+            ListNode node = dummy;
+            while(l1!=null || l2!=null)
+            {
+                int a = l1==null?Int32.MaxValue:l1.val;
+                int b = l2==null?Int32.MaxValue:l2.val;
+                if(a>b)
+                {
+                    node.next = l2;
+                    l2=l2.next;
+                }
+                else
+                {
+                    node.next = l1;
+                    l1=l1.next;
+                }
+                node = node.next;
+            }
+            return dummy.next;
+        }
+        //========================================================================================//
+        //----------22.  Generate Parentheses--Medium---------------------------------------------//
+        /*
+        Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+
+        For example, given n = 3, a solution set is:
+
+        [
+        "((()))",
+        "(()())",
+        "(())()",
+        "()(())",
+        "()()()"
+        ]
+        */
+
+        /*----------------------------Notes-----------------------------------------------------*/
+        /*
+        1. Choice: Place a '(' or a ')'
+        2. Constraints: We cannot place a '(' when the total number of '(' is equal to n;
+                        we cannot place a ')' when the number of ')' is equal to '(';
+        3. Goal: Form a string length is n*2
+        Back tracking:
+        n=3                open 0  close 0
+                                 |
+                              1, 0 "("
+                     |                      |
+                 2,0 "(("                   1,1 "()"
+            |              |                      |
+        3,0 "((("        2,1 "(()"              2,1 "()("
+            |           |          |          |            |
+    3,1 "((()"     3,1 "(()("  2,2 "(())"  3,1 "()(("    2,2 "()()"
+        |            |             |           |             |
+    3,2 "((())"   3,2 "(()()"  3,2"(())("   3,2 "()(()"  3,2 "()()("
+       |             |             |           |              |
+    3,3 "((()))"  3,3 "(()())" 3,3"(())()"  3,3"()(())"  3,3 "()()()"
+         */
+        public IList<string> GenerateParenthesis(int n) 
+        {
+            IList<string> res = new List<string>();
+            StringBuilder sb = new StringBuilder();
+            HelperGenerateParenthesis(res, sb, 0, 0, n);
+            return res;
+        }
+        public void HelperGenerateParenthesis(IList<string> res, StringBuilder sb, int open, int close, int n)
+        {
+            if(sb.Length==n*2)
+            {
+                res.Add(sb.ToString());
+                return;
+            }
+            if(open<n)
+            {
+                sb.Append('(');
+                HelperGenerateParenthesis(res, sb, open+1, close, n);
+                sb.Remove(sb.Length-1, 1);
+            }
+            if(close<open)
+            {
+                sb.Append(')');
+                HelperGenerateParenthesis(res, sb, open, close+1, n);
+                sb.Remove(sb.Length-1, 1);
+            }
+        }
+        //========================================================================================//
+        //----------23.  Merge k Sorted Lists--Hard-----------------------------------------------//
+        /*
+            Merge k sorted linked lists and return it as one sorted list. Analyze and describe its complexity.
+
+            Example:
+
+            Input:
+            [
+            1->4->5,
+            1->3->4,
+            2->6
+            ]
+            Output: 1->1->2->3->4->4->5->6
+        */
+        /*---------------Notes--------------------------------------------------------------------- */
+        /*
+        Time complexity: O(nlogn) Space Complexity: O(k)
+        Use heap since the lists are sorted.
+        first push all heads. 
+        Heap pop the min then push the next node of this pop result.
+         */
+        public ListNode MergeKLists(ListNode[] lists) 
+        {
+            PriorityQueue<ListNode> pq = new PriorityQueue<ListNode>(new ListComparer());
+            ListNode dummy = new ListNode(0);
+            ListNode node = dummy;
+            if(lists==null || lists.Length==0)
+                return dummy.next;
+            for(int i =0; i<lists.Length; i++)
+            {
+                if(lists[i]!=null)
+                    pq.Push(lists[i]);
+            }
+            while(pq.Size()>0)
+            {
+                ListNode cur = pq.Pop();
+                node.next = cur;
+                if(cur.next!=null)
+                    pq.Push(cur.next);
+                node = node.next;
+            }
+            return dummy.next;
+        }
+        public class ListComparer : IComparer<ListNode> 
+        {
+            public int Compare(ListNode a, ListNode b) {
+                return a.val-b.val;
+            }
+        }
+        //========================================================================================//
+        //----------24.  Swap Nodes in Pairs--Medium----------------------------------------------//
+        /*
+        Given a linked list, swap every two adjacent nodes and return its head.
+
+        Example:
+
+        Given 1->2->3->4, you should return the list as 2->1->4->3.
+        Note:
+
+        Your algorithm should use only constant extra space.
+        You may not modify the values in the list's nodes, only nodes itself may be changed.
+         */
+        public ListNode SwapPairs(ListNode head) 
+        {
+            ListNode dummy = new ListNode(0);
+            dummy.next = head;
+            ListNode prev = dummy;
+            ListNode node = head;
+            while(node!=null && node.next!=null)
+            {
+                ListNode temp = node.next.next;
+                prev.next = node.next;
+                node.next = temp;
+                prev.next.next = node;
+                prev = node;
+                node = node.next;
+            }
+            return dummy.next;
+        }
+        //========================================================================================//
+        //----------26.  Remove Duplicates from Sorted Array--Easy--------------------------------//
+        /*
+        Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return the new length.
+
+        Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+
+        Example 1:
+
+        Given nums = [1,1,2],
+
+        Your function should return length = 2, with the first two elements of nums being 1 and 2 respectively.
+
+        It doesn't matter what you leave beyond the returned length.
+        Example 2:
+
+        Given nums = [0,0,1,1,1,2,2,3,3,4],
+
+        Your function should return length = 5, with the first five elements of nums being modified to 0, 1, 2, 3, and 4 respectively.
+
+        It doesn't matter what values are set beyond the returned length.
+         */
+        /*-------------------------Notes------------------------------------------------------- */
+        /*
+        Two pointer p1 pointing to the pos that need to be swapped, p2 is looping through for the next value
+         */
+        public int RemoveDuplicates(int[] nums) 
+        {
+            if(nums==null || nums.Length==0)
+                return 0;
+
+        //herer can be refactored, if p1==p2 just ignore
+            int p1=0;
+            while(p1<nums.Length && nums[p1]!=nums[p1-1])
+            {
+                p1++;
+            }
+            int p2= p1;
+            while(p2<nums.Length)
+            {
+                if(nums[p2]>nums[p1-1])
+                {
+                    nums[p1] = nums[p2];
+                    p1++;
+                }
+                p2++;
+            }
+            return p1;
+        }
+        public int RemoveDuplicatesRefactored(int[] nums) 
+        {
+            if(nums==null || nums.Length==0)
+                return 0;
+            int p1 =0;
+            for(int i=1; i<nums.Length; i++)
+            {
+                if(nums[i]!=nums[p1])
+                {
+                    p1++;
+                    nums[p1] = nums[i];
+                }
+            }
+            return p1+1;
+        }
+        //========================================================================================//
+        //----------27. Remove Element--Easy--------------------------------//
+        /*
+        Given an array nums and a value val, remove all instances of that value in-place and return the new length.
+        Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
+        The order of elements can be changed. It doesn't matter what you leave beyond the new length.
+        Example 1:
+        Given nums = [3,2,2,3], val = 3,
+        Your function should return length = 2, with the first two elements of nums being 2.
+        It doesn't matter what you leave beyond the returned length.
+        Example 2:
+        Given nums = [0,1,2,2,3,0,4,2], val = 2,
+        Your function should return length = 5, with the first five elements of nums containing 0, 1, 3, 0, and 4.
+        Note that the order of those five elements can be arbitrary.
+        It doesn't matter what values are set beyond the returned length.
+        Clarification:
+        Confused why the returned value is an integer but your answer is an array?
+        Note that the input array is passed in by reference, which means modification to the input array will be known to the caller as well.
+        Internally you can think of this:
+        // nums is passed in by reference. (i.e., without making a copy)
+        int len = removeElement(nums, val);
+        // any modification to nums in your function would be known by the caller.
+        // using the length returned by your function, it prints the first len elements.
+        for (int i = 0; i < len; i++) {
+            print(nums[i]);
+        }
+         */
+        public int RemoveElement(int[] nums, int val) 
+        {
+            if(nums==null|| nums.Length==0)
+                return 0;
+            int p1 =0;
+            int p2 = nums.Length-1;
+            while(p1<=p2)
+            {
+                if(nums[p1]==val)
+                {
+                    nums[p1]=nums[p2];
+                    p2--;
+                }
+                else
+                    p1++;
+            }
+            return p2+1;
+        }
+        //========================================================================================//
+        //----------28. Implement strStr()--Easy--------------------------------------------------// 
+        /*
+            Implement strStr().
+
+            Return the index of the first occurrence of needle in haystack, or -1 if needle is not part of haystack.
+
+            Example 1:
+
+            Input: haystack = "hello", needle = "ll"
+            Output: 2
+            Example 2:
+
+            Input: haystack = "aaaaa", needle = "bba"
+            Output: -1
+        */      
+        public int StrStr(string haystack, string needle) 
+        {
+            if(string.IsNullOrEmpty(needle) )
+                return 0;
+            for(int i = 0; i<haystack.Length;i++)
+            {
+                for(int j=0; j<needle.Length; j++)
+                {
+                    if(i+j==haystack.Length)
+                        return -1;
+                    if(haystack[i+j]!=needle[j])
+                        break;
+                    else if(j==needle.Length-1)
+                    {
+                        return i;
+                    }
+                }
+            }
+            return -1;
+        } 
+        //========================================================================================//
+        //----------30. Substring with Concetenation of all words--Hard---------------------------// 
+        /*
+            You are given a string, s, and a list of words, words, that are all of the same length.
+            Find all starting indices of substring(s) in s that is a concatenation of each word in words 
+            exactly once and without any intervening characters.
+
+            Example 1:
+
+            Input:
+            s = "barfoothefoobarman",
+            words = ["foo","bar"]
+            Output: [0,9]
+            Explanation: Substrings starting at index 0 and 9 are "barfoor" and "foobar" respectively.
+            The output order does not matter, returning [9,0] is fine too.
+            Example 2:
+
+            Input:
+            s = "wordgoodgoodgoodbestword",
+            words = ["word","good","best","word"]
+            Output: []
+         */
+        public IList<int> FindSubstring(string s, string[] words) 
+        {
+            Dictionary<string, int> map = new Dictionary<string, int>();
+            IList<int> res = new List<int>();
+            if(string.IsNullOrEmpty(s)|| words==null || words.Length==0)
+                return res;
+            foreach(string word in words)
+            {
+                if(map.ContainsKey(word))
+                {
+                    map[word]++;
+                }
+                else
+                    map.Add(word,1);
+            }
+            int len = words[0].Length;
+            for(int i = 0; i<s.Length; i++)
+            {
+                Dictionary<string, int> copy = new Dictionary<string,int>();
+                bool breaked = false;
+                for(int j=0; j<words.Length; j++)
+                {
+                    if(i+j*len+len<=s.Length)
+                    {
+                        string sub = s.Substring(i+j*len,len);
+                        if(map.ContainsKey(sub))
+                        {
+                            if(copy.ContainsKey(sub))
+                            {
+                                if(copy[sub]==map[sub])
+                                {
+                                    breaked = true;
+                                    break;
+                                }
+                                copy[sub]++;
+                            }
+                            else
+                            {
+                                copy.Add(sub,1);
+                            }
+                        }
+                        else
+                        {
+                            breaked = true;
+                            break;
+                        }
+                    }
+                    else
+                        return res;
+
+                }
+                if(!breaked)
+                {
+                    res.Add(i);
+                }
+            }
+            return res;
+        }
+        //========================================================================================//
+        //----------31. Next Permutation--Medium--------------------------------------------------// 
+        /*
+            Implement next permutation, which rearranges numbers into the lexicographically next greater permutation of numbers.
+
+            If such arrangement is not possible, it must rearrange it as the lowest possible order (ie, sorted in ascending order).
+
+            The replacement must be in-place and use only constant extra memory.
+
+            Here are some examples. Inputs are in the left-hand column and its corresponding outputs are in the right-hand column.
+
+            1,2,3 → 1,3,2
+            3,2,1 → 1,2,3
+            1,1,5 → 1,5,1
+         */
+         /*-----------------------Notes------------------------------------------------------------*/
+         /*
+         Think about how permutation works using backtracking.
+         1,2,3,4-> 1,2,4,3 ->1,3,2,4->1,3,4,2->1,4,2,3->1,4,3,2->2,1,3,4->2,1,4,3->2,3,1,4->2,3,4,1->2,4,1,3->2,4,3,1
+               |       |           |      |          |    |            |      |          |      |          |    |
+
+         ->3,1,2,4->3,1,4,2->3,2,1,4->3,2,4,1->3,4,1,2->3,4,2,1->4,1,2,3->4,1,3,2->4,2,1,3->4,2,3,1->4,3,1,2->4,3,2,1
+                 |      |          |      |          |    |            |      |          |      |          |    |
+           
+          The marked place is where the end of increasing sequence from the end.
+          1. we can see that if 1,2,4,3 means this is the last sequence that start with 1,2 the next sequence should start with 1,3
+            and should be all ordered by ascending after 3 which is 1,3,2,4 is the first permutation that start with 1,3
+            
+            same 1,4,3,2 means the last permutation start from 1. 
+        2. to find the next permutation of 1,4,3,2 we need to first reverse the desending sequence to 1,2,3,4 
+        3. then we need to switch 1 with the first element greater than 1 , so the result is 2,1,3,4 
+           we can see that the result after 2 is all ascending which is the first permutation starts with 2.
+        
+        ex 3,4,2,1 ->3,1,2,4 ->swap 3 and 4 ->4,1,2,3
+          */
+        public void NextPermutation(int[] nums) 
+        {
+            int swapPos = nums.Length-2;
+            //find the index from the end that is not descending 
+            while(swapPos>=0)
+            {
+                if(nums[swapPos]>=nums[swapPos+1])
+                {
+                    swapPos--;
+                }
+                else
+                    break;
+            }
+            //reverse the descending sequence
+            Reverse(nums, swapPos+1, nums.Length-1);
+            //if not all descending swap the pos with the first one that is greater than it .
+            if(swapPos>=0)
+            {
+                int pos = swapPos+1;
+                while(nums[pos]<=nums[swapPos])
+                {
+                    pos++;
+                }
+                Swap(nums, swapPos, pos);
+            }
+        }
+        private void Swap(int[] nums, int a, int b)
+        {
+            int temp = nums[a];
+            nums[a] = nums[b];
+            nums[b] = temp;
+        }
+        private void Reverse(int[] nums, int start, int end)
+        {
+            while(start<end)
+            {
+                Swap(nums, start, end);
+                start++;
+                end--;
+            }
+        }
+        //========================================================================================//
+        //----------32. Longest Valid Parentheses--Hard-------------------------------------------// 
+        /*
+            Given a string containing just the characters '(' and ')', find the length of the longest valid (well-formed) parentheses substring.
+
+            Example 1:
+
+            Input: "(()"
+            Output: 2
+            Explanation: The longest valid parentheses substring is "()"
+            Example 2:
+
+            Input: ")()())"
+            Output: 4
+            Explanation: The longest valid parentheses substring is "()()"
+         */
+        public int LongestValidParentheses(string s) 
+        {
+            if(string.IsNullOrEmpty(s))
+                return 0;
+            int[] dp = new int[s.Length];
+            int max = 0;
+            dp[0]=0;
+            for(int i =1; i<s.Length; i++)
+            {
+                if(s[i]==')')
+                {
+                    if(s[i-1]=='(')
+                    {
+                        dp[i]= i-2>=0?dp[i-2]+2:2;
+                    }
+                    else if(i-dp[i-1]-1>=0 )
+                    {
+                        if(s[i-dp[i-1]-1]=='(')
+                        {
+                            dp[i]=dp[i-1]+2;
+                            if(i-dp[i]>=0)
+                            {
+                                dp[i]+=dp[i-dp[i]];
+                            }
+                            
+                        }
+                    }
+                    max = Math.Max(dp[i], max);
+                }
+            }
+            return max;
+        }
+        //========================================================================================//
+        //----------33. Find First and Last Position of Element in Sorted Array--Medium-----------// 
+        /*
+            Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
+
+            (i.e., [0,1,2,4,5,6,7] might become [4,5,6,7,0,1,2]).
+
+            You are given a target value to search. If found in the array return its index, otherwise return -1.
+
+            You may assume no duplicate exists in the array.
+
+            Your algorithm's runtime complexity must be in the order of O(log n).
+
+            Example 1:
+
+            Input: nums = [4,5,6,7,0,1,2], target = 0
+            Output: 4
+            Example 2:
+
+            Input: nums = [4,5,6,7,0,1,2], target = 3
+            Output: -1
+         */
+        public int Search(int[] nums, int target) 
+        {
+            if(nums==null|| nums.Length==0)
+                return -1;
+            int start = 0;
+            int end = nums.Length-1;
+            while(start+1<end)
+            {
+                int mid = start+(end-start)/2;
+                if(nums[mid]>=nums[0])
+                {
+                    if(target<nums[mid] && target>=nums[0])
+                        end = mid;
+                    else
+                    {
+                        start = mid;
+                    }
+                }
+                else
+                {
+                    if(target>nums[mid] && target<=nums[nums.Length-1])
+                    {
+                        start= mid;
+                    }
+                    else
+                        end = mid;
+                }
+            }
+            if(nums[start] ==target)
+                return start;
+            if(nums[end] == target)
+                return end;
+            return -1;
+        }
+
+        //========================================================================================//
+        //----------34. Find First and Last Position of Element in Sorted Array--Medium-----------// 
+        /*
+        Given an array of integers nums sorted in ascending order, find the starting and ending position of a given target value.
+
+        Your algorithm's runtime complexity must be in the order of O(log n).
+
+        If the target is not found in the array, return [-1, -1].
+
+        Example 1:
+
+        Input: nums = [5,7,7,8,8,10], target = 8
+        Output: [3,4]
+        Example 2:
+
+        Input: nums = [5,7,7,8,8,10], target = 6
+        Output: [-1,-1]
+         */
+        public int[] SearchRange(int[] nums, int target) 
+        {
+            if(nums==null || nums.Length ==0)
+                return new int[2]{-1,-1};
+            int[] res = new int[2]; 
+            res[0] = BinarySearch(nums, target, true);
+            res[1] = BinarySearch(nums, target, false);
+            return res;
+        }
+        private int BinarySearch(int[] nums, int target, bool isFirst)
+        {
+            int start = 0; int end = nums.Length-1;
+            while(start+1<end)
+            {
+                int mid = start+(end-start)/2;
+                if(isFirst)
+                {
+                    if(nums[mid]<target)
+                    {
+                        start = mid;
+                    }
+                    else
+                    {
+                        end = mid;
+                    }
+                }
+                else
+                {
+                    if(nums[mid]<=target)
+                    {
+                        start = mid;
+                    }
+                    else
+                    {
+                        end = mid;
+                    }
+                }
+            }
+            if(nums[start]==target&& nums[end]==target)
+            {
+                if(isFirst)
+                    return start;
+                return end;
+            }
+            else if(nums[start]==target)
+                return start;
+            else if(nums[end]==target)
+                return end;
+            return -1;
+
+        }
+        //========================================================================================//
+        //----------35. Search Insert Position--Easy----------------------------------------------// 
+        /*
+            Given a sorted array and a target value, return the index if the target is found. If not, return the index where it would be if it were inserted in order.
+
+            You may assume no duplicates in the array.
+
+            Example 1:
+
+            Input: [1,3,5,6], 5
+            Output: 2
+            Example 2:
+
+            Input: [1,3,5,6], 2
+            Output: 1
+            Example 3:
+
+            Input: [1,3,5,6], 7
+            Output: 4
+            Example 4:
+
+            Input: [1,3,5,6], 0
+            Output: 0
+         */
+        public int SearchInsert(int[] nums, int target) 
+        {
+            if(nums==null || nums.Length==0)
+                return 0;
+            int start = 0, end = nums.Length-1;
+            while(start+1<end)
+            {
+                int mid = start+(end-start)/2;
+                if(nums[mid]<target)
+                {
+                    start = mid;
+                }
+                else
+                    end = mid;
+            }
+            if(nums[start]==target)
+                return start;
+            else if(nums[start]<target&&nums[end]>=target)
+                return end;
+            else if(nums[end]<target)
+                return nums.Length;
+            else 
+                return 0;
+        }
+        //========================================================================================//
+        //----------36. Valid Soduku--Medium------------------------------------------------------// 
+        public bool IsValidSudoku(char[,] board)
+        {
+            List<HashSet<char>> subBoxes = new  List<HashSet<char>>() ;
+            subBoxes.Add(new HashSet<char>());
+            subBoxes.Add(new HashSet<char>());
+            subBoxes.Add(new HashSet<char>());
+            for(int i =0; i<9; i++)
+            {
+                HashSet<char> verSet = new HashSet<char>();
+                HashSet<char> horiSet = new HashSet<char>();
+                if(i==3 || i==6)
+                {
+                    subBoxes[0].Clear();
+                    subBoxes[1].Clear();
+                    subBoxes[2].Clear();
+                }
+                for(int j=0; j<9;j++)
+                {
+                    if(board[i,j]!='.')
+                    {
+                        if(!verSet.Add(board[i,j]))
+                            return false;
+                        if(!subBoxes[j/3].Add(board[i,j]))
+                        {
+                            return false;
+                        }
+                    }
+                    if(board[j,i]!='.')
+                    {
+                        if(!horiSet.Add(board[j,i]))
+                            return false;
+                    }
+                }
+            }
+            return true;
+        }
+
+        
     }
 }

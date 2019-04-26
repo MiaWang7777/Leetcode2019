@@ -66,6 +66,71 @@ namespace LeetCode2019.ByCategory
                 }
             }
         }
+        //========================================================================================//
+        //----------22.  Generate Parentheses--Medium---------------------------------------------//
+        /*
+        Given n pairs of parentheses, write a function to generate all combinations of well-formed parentheses.
+
+        For example, given n = 3, a solution set is:
+
+        [
+        "((()))",
+        "(()())",
+        "(())()",
+        "()(())",
+        "()()()"
+        ]
+        */
+
+        /*----------------------------Notes-----------------------------------------------------*/
+        /*
+        1. Choice: Place a '(' or a ')'
+        2. Constraints: We cannot place a '(' when the total number of '(' is equal to n;
+                        we cannot place a ')' when the number of ')' is equal to '(';
+        3. Goal: Form a string length is n*2
+        Back tracking:
+        n=3                open 0  close 0
+                                 |
+                              1, 0 "("
+                     |                      |
+                 2,0 "(("                   1,1 "()"
+            |              |                      |
+        3,0 "((("        2,1 "(()"              2,1 "()("
+            |           |          |          |            |
+    3,1 "((()"     3,1 "(()("  2,2 "(())"  3,1 "()(("    2,2 "()()"
+        |            |             |           |             |
+    3,2 "((())"   3,2 "(()()"  3,2"(())("   3,2 "()(()"  3,2 "()()("
+       |             |             |           |              |
+    3,3 "((()))"  3,3 "(()())" 3,3"(())()"  3,3"()(())"  3,3 "()()()"
+         */
+        public IList<string> GenerateParenthesis(int n) 
+        {
+            IList<string> res = new List<string>();
+            StringBuilder sb = new StringBuilder();
+            HelperGenerateParenthesis(res, sb, 0, 0, n);
+            return res;
+        }
+        public void HelperGenerateParenthesis(IList<string> res, StringBuilder sb, int open, int close, int n)
+        {
+            if(sb.Length==n*2)
+            {
+                res.Add(sb.ToString());
+                return;
+            }
+            if(open<n)
+            {
+                sb.Append('(');
+                HelperGenerateParenthesis(res, sb, open+1, close, n);
+                sb.Remove(sb.Length-1, 1);
+            }
+            if(close<open)
+            {
+                sb.Append(')');
+                HelperGenerateParenthesis(res, sb, open, close+1, n);
+                sb.Remove(sb.Length-1, 1);
+            }
+        }
+
     
     }
 }

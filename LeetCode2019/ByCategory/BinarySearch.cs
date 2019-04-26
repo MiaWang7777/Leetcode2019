@@ -58,5 +58,132 @@ namespace LeetCode2019.ByCategory
             }
             return FindKthElement(nums1, start1, nums2, mid2+1, k-k/2);
         }
+
+        //========================================================================================//
+        //----------33. Find First and Last Position of Element in Sorted Array--Medium-----------// 
+        /*
+            Suppose an array sorted in ascending order is rotated at some pivot unknown to you beforehand.
+
+            (i.e., [0,1,2,4,5,6,7] might become [4,5,6,7,0,1,2]).
+
+            You are given a target value to search. If found in the array return its index, otherwise return -1.
+
+            You may assume no duplicate exists in the array.
+
+            Your algorithm's runtime complexity must be in the order of O(log n).
+
+            Example 1:
+
+            Input: nums = [4,5,6,7,0,1,2], target = 0
+            Output: 4
+            Example 2:
+
+            Input: nums = [4,5,6,7,0,1,2], target = 3
+            Output: -1
+         */
+        public int Search(int[] nums, int target) 
+        {
+            if(nums==null|| nums.Length==0)
+                return -1;
+            int start = 0;
+            int end = nums.Length-1;
+            while(start+1<end)
+            {
+                int mid = start+(end-start)/2;
+                if(nums[mid]>=nums[0])
+                {
+                    if(target<nums[mid] && target>=nums[0])
+                        end = mid;
+                    else
+                    {
+                        start = mid;
+                    }
+                }
+                else
+                {
+                    if(target>nums[mid] && target<=nums[nums.Length-1])
+                    {
+                        start= mid;
+                    }
+                    else
+                        end = mid;
+                }
+            }
+            if(nums[start] ==target)
+                return start;
+            if(nums[end] == target)
+                return end;
+            return -1;
+        }
+
+        //========================================================================================//
+        //----------34. Find First and Last Position of Element in Sorted Array--Medium-----------// 
+        /*
+        Given an array of integers nums sorted in ascending order, find the starting and ending position of a given target value.
+
+        Your algorithm's runtime complexity must be in the order of O(log n).
+
+        If the target is not found in the array, return [-1, -1].
+
+        Example 1:
+
+        Input: nums = [5,7,7,8,8,10], target = 8
+        Output: [3,4]
+        Example 2:
+
+        Input: nums = [5,7,7,8,8,10], target = 6
+        Output: [-1,-1]
+         */
+        public int[] SearchRange(int[] nums, int target) 
+        {
+            if(nums==null || nums.Length ==0)
+                return new int[2]{-1,-1};
+            int[] res = new int[2]; 
+            res[0] = BinarySearchHelper(nums, target, true);
+            res[1] = BinarySearchHelper(nums, target, false);
+            return res;
+        }
+        private int BinarySearchHelper(int[] nums, int target, bool isFirst)
+        {
+            int start = 0; int end = nums.Length-1;
+            while(start+1<end)
+            {
+                int mid = start+(end-start)/2;
+                if(isFirst)
+                {
+                    if(nums[mid]<target)
+                    {
+                        start = mid;
+                    }
+                    else
+                    {
+                        end = mid;
+                    }
+                }
+                else
+                {
+                    if(nums[mid]<=target)
+                    {
+                        start = mid;
+                    }
+                    else
+                    {
+                        end = mid;
+                    }
+                }
+            }
+            if(nums[start]==target&& nums[end]==target)
+            {
+                if(isFirst)
+                    return start;
+                return end;
+            }
+            else if(nums[start]==target)
+                return start;
+            else if(nums[end]==target)
+                return end;
+            return -1;
+
+        }
     }
 }
