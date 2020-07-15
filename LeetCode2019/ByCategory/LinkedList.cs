@@ -183,5 +183,74 @@ namespace LeetCode2019.ByCategory
             head.next = null;
             return reversedHead;
          }
+
+        //reverse Doubly  LinkedList
+        public  DoublyLinkedListNode ReverseDoublyLinkedList(DoublyLinkedListNode head) 
+        {
+            DoublyLinkedListNode node = head;
+            DoublyLinkedListNode reversed = null;
+            while(node!=null)
+            {
+                DoublyLinkedListNode temp = node.next;
+                
+                node.next = reversed;
+                if(reversed!=null)
+                    reversed.prev = node;
+                reversed = node;
+                node = temp;
+                temp.prev = null;
+            }
+            return reversed;
+        }
+
+        //========================================================================================//
+        //----------92.  Reverse Linked List II--Medium------------------------------------------//
+        /*
+        Reverse a linked list from position m to n. Do it in one-pass.
+
+        Note: 1 ≤ m ≤ n ≤ length of list.
+
+        Example:
+
+        Input: 1->2->3->4->5->NULL, m = 2, n = 4
+        Output: 1->4->3->2->5->NULL
+         */
+        public ListNode ReverseBetween(ListNode head, int m, int n) {
+            ListNode dummy = new ListNode(0);
+            dummy.next = head;
+            ListNode node = head;
+            ListNode prev = dummy;
+            ListNode reversedHead = null;
+            ListNode reversedTail = null;
+            int count =0;
+            while(node!=null)
+            {
+                count++;
+                ListNode temp = node.next;
+                if(count==m-1)
+                {
+                    prev = node;
+                }
+                else if(count>=m && count<=n)
+                {
+                    
+                    node.next = reversedHead;
+                    reversedHead = node;
+                    
+                    if(count==m)
+                    {
+                        reversedTail = reversedHead;
+                    }
+                    if(count==n)
+                    {
+                        prev.next = reversedHead;
+                        reversedTail.next =temp;
+                    }
+                }
+                node = temp;
+            }
+            return dummy.next;
+        }
+        
     }
 }

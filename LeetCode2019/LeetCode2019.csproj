@@ -8,6 +8,9 @@
   <ItemGroup>
     <Folder Include="ByCategory\" />
     <Folder Include="ByCompany\" />
+    <Folder Include="ByOrder\" />
+    <Folder Include="EPI\" />
+    <Folder Include="Shared\" />
   </ItemGroup>
 
 </Project>

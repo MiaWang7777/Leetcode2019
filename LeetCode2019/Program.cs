@@ -1,17 +1,21 @@
 ﻿using System;
-
+using LeetCode2019.Shared;
+using LeetCode2019.ByOrder;
 namespace LeetCode2019
 {
     class Program
     {
         static void Main(string[] args)
         {
-            int[] arr = new int[]{1,2,3,4,5,6,7,8};
-            ShiftLeft(arr, 3);
-            foreach(var a in arr)
-            {
-                Console.WriteLine(a+"/");
-            }
+            Top51_100 sol = new Top51_100();
+            TreeNode p = new TreeNode(1);
+            p.left = new TreeNode(2);
+            p.right = new TreeNode(3);
+            TreeNode q = new TreeNode(1);
+            q.left = new TreeNode(2);
+            q.right = new TreeNode(3);
+
+            bool res = sol.IsSameTreeIterative(p, q);
         }
         public static void ShiftLeft(int[] arr, int i)
         {

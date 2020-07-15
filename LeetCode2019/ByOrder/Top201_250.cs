@@ -44,5 +44,61 @@ namespace LeetCode2019.ByOrder
             head.next = null;
             return reversedHead;
          }
+
+        //========================================================================================//
+        //----------230.  Kth Smallest Element in a BST--Medium------------------------------------//
+        /*
+        Given a binary search tree, write a function kthSmallest to find the kth smallest element in it.
+
+        Note: 
+        You may assume k is always valid, 1 ≤ k ≤ BST's total elements.
+
+        Example 1:
+
+        Input: root = [3,1,4,null,2], k = 1
+          3
+         / \
+        1   4
+         \
+          2
+        Output: 1
+        Example 2:
+
+        Input: root = [5,3,6,2,4,null,null,1], k = 3
+             5
+            / \
+           3   6
+          / \
+         2   4
+         /
+        1
+        Output: 3
+
+         */
+        public int KthSmallest(TreeNode root, int k) 
+        {
+            int[] res = Helper(root, k);
+            return res[1];
+        }
+        private int[] Helper(TreeNode node, int k)
+        {
+            if(node == null)
+                return new int[]{0,0};
+            int[] left = Helper(node.left, k);
+            if(left[0]>=k)
+            {
+                return left;
+            }
+            left[0]++;
+            if(left[0]==k)
+            {
+                left[1] = node.val;
+                return left;
+            }
+            int[] right = Helper(node.right, k-left[0]);
+            right[0]+=left[0];
+            return right;
+            
+        }
     }
 }
