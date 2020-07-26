@@ -41,7 +41,27 @@ namespace LeetCode2019.ByOrder
             }
             throw new InvalidOperationException("No result returned");
         }
-        /*使用hashmap： time O(n), space O(n)
+        /*使用 two pass hashmap*/
+        public int[] TwoSumTwoPassHashMap(int[] nums, int target) {
+            IDictionary<int, int> map = new Dictionary<int, int>();
+            for(int i = 0; i<nums.Length; i++)
+            {
+                if(!map.ContainsKey(nums[i]))
+                    map.Add(nums[i], i);
+                else
+                {
+                    map[nums[i]] = i;
+                }
+            }
+            for(int i = 0; i<nums.Length; i++)
+            {
+                int remain = target-nums[i];
+                if(map.ContainsKey(remain) && map[remain]!=i)
+                    return new int[]{i, map[remain]};
+            }
+            throw new ArgumentException("No result found");
+         }
+        /*使用 one pass hashmap： time O(n), space O(n)
          * 1. use hashmap to store and look up the elements before current position
          * 2. if there is an element exists add curent nums[i] is target then return the result.
          * 3. if no add current element to hashmap 

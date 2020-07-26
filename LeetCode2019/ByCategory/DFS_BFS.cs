@@ -7,6 +7,57 @@ namespace LeetCode2019.ByCategory
 {
     public class DFS_BFS
     {
+        //==========================================BFS===========================================//
+        //----------103. Binary Tree Zigzag Level Order Traversal--Medium-------------------------//
+        /*
+        Given a binary tree, return the zigzag level order traversal of its nodes' values. (ie, from left to right, then right to left for the next level and alternate between).
+
+            For example:
+            Given binary tree [3,9,20,null,null,15,7],
+                3
+            / \
+            9  20
+                /  \
+            15   7
+            return its zigzag level order traversal as:
+            [
+            [3],
+            [20,9],
+            [15,7]
+            ]
+        */
+        /// <summary>
+        /// Solution1: BFS
+        /// Time Complexity: O(n), Space Complexity: O(largest count of one level)
+        /// </summary>
+        public IList<IList<int>> ZigzagLevelOrder(TreeNode root) {
+            IList<IList<int>> res = new List<IList<int>>();
+            if(root ==null)
+                return res;
+            Queue<TreeNode> queue = new Queue<TreeNode>();
+            queue.Enqueue(root);
+            bool even = false;
+            while(queue.Count>0)
+            {
+                IList<int> level = new List<int>();
+                int size = queue.Count;
+                for(int i = 0; i<size; i++)
+                {
+                    TreeNode curNode = queue.Dequeue();
+                    if(even)
+                        level.Insert(0, curNode.val);
+                    else
+                        level.Add(curNode.val);
+                    if(curNode.left!=null)
+                        queue.Enqueue(curNode.left);
+                    if(curNode.right!=null)
+                        queue.Enqueue(curNode.right);
+                }
+                res.Add(level);
+                even=!even;
+            }
+            return res;
+        }
         //=======================================DFS=================================================//
         //----------104. Maximum Depth of Binary Tree--Easy-----------------------------------------//
         /*

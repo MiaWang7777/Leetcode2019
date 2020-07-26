@@ -62,7 +62,7 @@ namespace LeetCode2019.ByCategory
             }
             return res;
         }
-                //========================================================================================//
+        //========================================================================================//
         //----------15. 3 Sum--Medium-------------------------------------------------------------//
         /*
         Given an array nums of n integers, are there elements a, b, c in nums such that a + b + c = 0? Find all unique triplets in the array which gives the sum of zero.
@@ -311,7 +311,7 @@ namespace LeetCode2019.ByCategory
             return head;
         }
 
-                //========================================================================================//
+        //========================================================================================//
         //----------26.  Remove Duplicates from Sorted Array--Easy--------------------------------//
         /*
         Given a sorted array nums, remove the duplicates in-place such that each element appear only once and return the new length.
@@ -343,7 +343,7 @@ namespace LeetCode2019.ByCategory
                 return 0;
 
         //herer can be refactored, if p1==p2 just ignore
-            int p1=0;
+            int p1=1;
             while(p1<nums.Length && nums[p1]!=nums[p1-1])
             {
                 p1++;
@@ -376,7 +376,7 @@ namespace LeetCode2019.ByCategory
             return p1+1;
         }
 
-                //----------27. Remove Element--Easy--------------------------------//
+        //----------27. Remove Element--Easy--------------------------------//
         /*
         Given an array nums and a value val, remove all instances of that value in-place and return the new length.
         Do not allocate extra space for another array, you must do this by modifying the input array in-place with O(1) extra memory.
@@ -456,5 +456,43 @@ namespace LeetCode2019.ByCategory
             }
             return -1;
         } 
+        //========================================================================================//
+        //----------167.Two Sum II - Input array is sorted--Easy----------------------------------//
+        /*
+            Given an array of integers that is already sorted in ascending order, find two numbers such that they add up to a specific target number.
+
+            The function twoSum should return indices of the two numbers such that they add up to the target, where index1 must be less than index2.
+
+            Note:
+
+            Your returned answers (both index1 and index2) are not zero-based.
+            You may assume that each input would have exactly one solution and you may not use the same element twice.
+            Example:
+
+            Input: numbers = [2,7,11,15], target = 9
+            Output: [1,2]
+            Explanation: The sum of 2 and 7 is 9. Therefore index1 = 1, index2 = 2.
+        */
+        /// <summary>
+        /// Two Pointer
+        /// Time Complexity: O(n), Space Complexity: O(1)
+        /// </summary>
+        public int[] TwoSumSortedArray(int[] numbers, int target) {
+            int start = 0;
+            int end = numbers.Length-1;
+            while(start<end)
+            {
+                int sum = numbers[start]+numbers[end];
+                if(sum==target)
+                {
+                    return new int[]{start+1, end+1};
+                }
+                else if(sum>target)
+                    end--;
+                else
+                    start++;
+            }
+            throw new ArgumentException("No result found");
+        }
     }
 }
